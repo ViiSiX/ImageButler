@@ -1,7 +1,7 @@
 import re
 import uuid
-import hashlib
-from sys import version_info
+import base64
+from Crypto import Random
 from Crypto.Hash import SHA256
 
 
@@ -16,27 +16,17 @@ def validate_email(email):
         raise TypeError('Email should be string, not {0}'.format(type(email)))
 
 
-def encrypt_password(password):
-    """
-    Encrypt the clear-text password to SHA hash.
-    :param password: Password in clear text.
-    :type password: str
-    :return: Hashed string.
-    """
+def generate_user_name():
+    """Return an UUID string as new user name."""
 
-    if password is None:
-        raise TypeError("Password should be a string!")
-    if version_info >= (3, 0):
-        if not isinstance(password, str):
-            raise TypeError("Password should be a string!")
-    else:
-        if not isinstance(password, (str, unicode)):
-            raise TypeError("Password should be a string!")
+    return str(uuid.uuid4())
 
-    salt = uuid.uuid4().hex
-    return \
-        hashlib.sha512(salt.encode() + password.encode()).\
-        hexdigest() + ':' + salt
+
+def generate_password():
+    """Return a password string."""
+
+    rng = Random.new().read
+    return base64.b64encode(rng(96)).decode('ascii')
 
 
 def get_checksum(data):

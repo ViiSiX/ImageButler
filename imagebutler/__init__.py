@@ -2,7 +2,7 @@
 
 from .imagebutler import app, api_bp
 from . import models
-from . import api, views
+from . import apis, commands, views
 
 
 __version__ = '0.0.1dev'

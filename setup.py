@@ -15,12 +15,17 @@ setup(
     author_email='nghia@viisix.space',
     description='Simple images serving service,',
     packages=['imagebutler'],
+    entry_points="""
+        [flask.commands]
+        user=imagebutler.commands:user
+    """,
     include_package_data=True,
     install_requires=[
         'Flask',
         'Flask-Restful',
         'Flask-SQLAlchemy',
         'Flask-Migrate',
+        'Flask-Redislite',
         'pycrypto'
     ]
 )

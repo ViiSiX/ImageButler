@@ -1,5 +1,5 @@
 from flask import Flask, Blueprint
-from flask_restful import Api
+from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -14,7 +14,7 @@ app.config.from_envvar('IMAGEBUTLER_CONFIGS', silent=True)
 config = app.config
 api_bp = Blueprint('api_v0',
                    __name__,
-                   url_prefix='/api/{0}'.
+                   url_prefix='/api/v{0}'.
                    format(config['IMAGEBUTLER_API_VERSION']))
 api = Api(api_bp)
 db = SQLAlchemy(app)

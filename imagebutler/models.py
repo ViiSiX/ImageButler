@@ -28,23 +28,23 @@ class User(UserMixin, CustomModelMixin, db.Model):
                           index=True, unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     is_active = db.Column('isActive', db.Boolean,
-                          nullable=False, default=True)
+                          nullable=False, default=False)
     last_login = db.Column('lastLogin', db.DateTime, nullable=True)
 
     # Relationships
     images = db.relationship('Image', backref='User', lazy='joined')
     
-    def __init__(self, user_email, user_password):
+    def __init__(self, user_email):
         """
         Constructor for User class.
         :param user_email: User's email.
-        :param user_password: User's password in clear text.
         """
         if utils.validate_email(user_email):
             self.email = user_email
         else:
             raise ValueError('Email %s is not valid!' % user_email)
-        self.password = utils.encrypt_password(user_password)
+        self.user_name = utils.generate_user_name()
+        self.password = utils.generate_password()
         self.version = config['IMAGEBUTLER_MODELS_VERSION']['User']
         
     @property
@@ -58,6 +58,10 @@ class User(UserMixin, CustomModelMixin, db.Model):
             return unicode(self.user_id)
         except NameError:
             return str(self.user_id)
+
+    def change_password(self):
+        """Set new password for this user."""
+        self.password = utils.generate_password()
         
     def __repr__(self):
         """Print the User instance."""

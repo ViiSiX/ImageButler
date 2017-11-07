@@ -4,17 +4,22 @@ click==6.7
 Flask==0.12.2
 Flask-Login==0.4.0
 Flask-Migrate==2.1.1
+Flask-Redislite==0.1.1
 Flask-RESTful==0.3.6
 Flask-SQLAlchemy==2.3.2
--e git+ssh://git@git.viisix.space:8222/ViiSiX/ImageButler.git@0f238c07e32bc991c1149631f8bf7e9522136ad3#egg=imagebutler
 itsdangerous==0.24
 Jinja2==2.9.6
 Mako==1.0.7
 MarkupSafe==1.0
+psutil==5.4.0
 pycrypto==2.6.1
 python-dateutil==2.6.1
 python-editor==1.0.3
 pytz==2017.2
+redis==2.10.6
+redis-collections==0.4.2
+redislite==3.2.311
+rq==0.9.1
 six==1.11.0
 SQLAlchemy==1.1.14
 Werkzeug==0.12.2
