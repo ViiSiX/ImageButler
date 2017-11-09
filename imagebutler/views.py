@@ -1,11 +1,14 @@
 """Docstring for image_butler.views module."""
 
-from flask import jsonify
+from flask import jsonify, make_response
 from .imagebutler import app
+from .models import ImageModel
 
 
 @app.route('/')
-def index():
+@app.route('/serve')
+@app.route('/serve/image')
+def index_view():
     """Return a JSON that specific what will this application do."""
     
     return jsonify({
@@ -16,3 +19,15 @@ def index():
             'api': '0'
         }
     })
+
+
+@app.route('/serve/image/<int:user_id>/<string:file_name>')
+def image_view(user_id, file_name):
+    im = ImageModel.query.\
+        filter_by(user_id=user_id, file_name=file_name).first()
+    if im is not None:
+        response = make_response(im.file_content)
+        response.headers['Content-Type'] = im.file_mime
+        return response
+    else:
+        return jsonify({'error': 'Not a single image found!'})

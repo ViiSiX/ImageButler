@@ -3,6 +3,8 @@
 import datetime
 from flask_login import UserMixin
 from imagebutler import utils
+from werkzeug.datastructures import FileStorage
+from PIL import Image
 from .imagebutler import db, config
 
 
@@ -17,9 +19,12 @@ class CustomModelMixin(object):
     version = db.Column(db.Integer, index=False, nullable=False)
     
 
-class User(UserMixin, CustomModelMixin, db.Model):
-    """imagebutler.models.User"""
-    
+class UserModel(UserMixin, CustomModelMixin, db.Model):
+    """imagebutler.models.UserModel"""
+
+    # Table name
+    __tablename__ = 'user'
+
     # Columns definition
     user_id = db.Column('id', db.Integer,
                         primary_key=True, autoincrement=True)
@@ -32,7 +37,7 @@ class User(UserMixin, CustomModelMixin, db.Model):
     last_login = db.Column('lastLogin', db.DateTime, nullable=True)
 
     # Relationships
-    images = db.relationship('Image', backref='User', lazy='joined')
+    images = db.relationship('ImageModel', backref='UserModel', lazy='joined')
     
     def __init__(self, user_email):
         """
@@ -43,7 +48,7 @@ class User(UserMixin, CustomModelMixin, db.Model):
             self.email = user_email
         else:
             raise ValueError('Email %s is not valid!' % user_email)
-        self.user_name = utils.generate_user_name()
+        self.user_name = utils.generate_uuid()
         self.password = utils.generate_password()
         self.version = config['IMAGEBUTLER_MODELS_VERSION']['User']
         
@@ -71,28 +76,56 @@ class User(UserMixin, CustomModelMixin, db.Model):
         )
 
 
-class Image(CustomModelMixin, db.Model):
-    """imagebutler.models.Image"""
+class ImageModel(CustomModelMixin, db.Model):
+    """imagebutler.models.ImageModel"""
+
+    # Table name
+    __tablename__ = 'image'
     
     # Columns definition
     image_id = db.Column('id', db.Integer,
                          primary_key=True, autoincrement=True)
-    content = db.Column('content', db.LargeBinary,
-                        nullable=False)
-    checksum = db.Column('contentChecksum', db.String(255),
-                         nullable=False)
+    file_name = db.Column('fileName', db.String(255),
+                          index=True, nullable=False)
+    file_description = db.Column('fileDescription', db.UnicodeText,
+                                 nullable=True)
+    file_mime = db.Column('fileMIME', db.String(55),
+                          nullable=False)
+    file_content = db.Column('fileContent', db.LargeBinary,
+                             nullable=False)
+    file_exif = db.Column('fileEXIF', db.Binary,
+                          nullable=True)
+    file_checksum = db.Column('fileChecksum', db.String(255),
+                              nullable=False)
     user_id = db.Column('userId', db.Integer,
                         db.ForeignKey('user.id'), nullable=False)
 
     # Relationships
 
-    def __init__(self, content):
-        """
-        Construction for Image class.
-
-        :param content: Binary content of the Image.
+    def __init__(self, file, user_id, file_description=None):
         """
 
-        self.content = content
-        self.checksum = utils.get_checksum(content)
+        :param file:
+        :type file: FileStorage
+        """
+
+        utils.validate_mime(file.mimetype)
+        file_ext = file.filename.split('.')[-1]
+        self.file_name = '{0}.{1}'.format(
+            utils.generate_uuid().replace('-', ''),
+            file_ext
+        )
+        self.file_description = \
+            file.filename if file_description is None else file_description
+        self.file_mime = file.mimetype
+        self.user_id = user_id
         self.version = config['IMAGEBUTLER_MODELS_VERSION']['Image']
+
+        # Image processing
+        image = Image.open(file.stream)
+        image_sio = utils.BytesIO()
+        image.save(image_sio, format=image.format)
+
+        self.file_exif = utils.get_image_exif(image)
+        self.file_content = image_sio.getvalue()
+        self.file_checksum = utils.get_checksum(self.file_content)
