@@ -20,6 +20,7 @@ setup(
     version=version,
     author='Trong-Nghia Nguyen',
     author_email='nghia@viisix.space',
+    url='https://viisix.space/projects/image-butler/',
     description='Simple images serving service,',
     long_description=description,
     packages=['imagebutler', 'imagebutler.apis'],
@@ -37,5 +38,15 @@ setup(
         'Flask-Login',
         'pycrypto',
         'Pillow'
+    ],
+    classifiers=[
+        'Development Status :: 2 - Pre-Alpha',
+        'Environment :: Console',
+        'Environment :: Web Environment',
+        'Framework :: Flask',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: Unix',
+        'Programming Language :: Python :: 3.6'
     ]
 )

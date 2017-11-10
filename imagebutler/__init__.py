@@ -5,6 +5,6 @@ from . import models
 from . import apis, commands, views
 
 
-__version__ = '0.0.1b'
+__version__ = '0.0.1b1'
 
 app.register_blueprint(api_bp)
