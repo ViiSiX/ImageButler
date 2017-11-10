@@ -2,6 +2,7 @@ from flask import Flask, Blueprint
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_redislite import FlaskRedis
 
 
 app = Flask(__name__)
@@ -19,3 +20,5 @@ api_bp = Blueprint('api_v0',
 api = Api(api_bp)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+rdb = FlaskRedis(app,
+                 rq=True, rq_queues=['serving'])

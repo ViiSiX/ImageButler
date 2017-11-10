@@ -6,6 +6,7 @@ from imagebutler import utils
 from werkzeug.datastructures import FileStorage
 from PIL import Image
 from .imagebutler import db, config
+from .types import ImageServingObject
 
 
 class CustomModelMixin(object):
@@ -129,3 +130,7 @@ class ImageModel(CustomModelMixin, db.Model):
         self.file_exif = utils.get_image_exif(image)
         self.file_content = image_sio.getvalue()
         self.file_checksum = utils.get_checksum(self.file_content)
+
+    @property
+    def serving_object(self):
+        return ImageServingObject(self.file_mime, self.file_content)

@@ -1,4 +1,9 @@
 *.pyc
 *.egg-info
 *.db
+*.rdb
+*.rdb.settings
+*.pid
 *.conf
+
+migrations

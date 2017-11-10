@@ -1,8 +1,9 @@
 """Docstring for image_butler.views module."""
 
-from flask import jsonify, make_response
-from .imagebutler import app
+from flask import jsonify
+from .imagebutler import app, rdb
 from .models import ImageModel
+from .job_workers import worker_do_cache_redis
 
 
 @app.route('/')
@@ -23,11 +24,21 @@ def index_view():
 
 @app.route('/serve/image/<int:user_id>/<string:file_name>')
 def image_view(user_id, file_name):
-    im = ImageModel.query.\
-        filter_by(user_id=user_id, file_name=file_name).first()
-    if im is not None:
-        response = make_response(im.file_content)
-        response.headers['Content-Type'] = im.file_mime
-        return response
-    else:
-        return jsonify({'error': 'Not a single image found!'})
+    queue = rdb.queue['serving']
+    try:
+        cached_object = queue.fetch_job(file_name).result
+        return cached_object.make_response()
+    except AttributeError:
+        im = ImageModel.query.\
+            filter_by(user_id=user_id, file_name=file_name).first()
+        if im is not None:
+            if rdb.worker_process is None:
+                rdb.start_worker()
+            queue.enqueue(
+                f=worker_do_cache_redis,
+                kwargs={'caching_object': im.serving_object},
+                job_id=file_name
+            )
+            return im.serving_object.make_response()
+        else:
+            return jsonify({'error': 'Not a single image found!'})
