@@ -1,0 +1,18 @@
+ImageButler is writen and maintained by ViiSiX organization
+[https://viisix.space]
+
+Copyrights notice
+`````````````````
+This too developed base on Flask and its extensions. See requirements.txt
+for more details.
+Others libraries include (via Flask's extensions or not:
+- SQLAlchemy
+- Redislite
+- Others (see more in requirements.txt
+
+Main developer
+``````````````
+Trong-Nghia Nguyen <nghia@viisix.space>
+
+Contributors
+````````````
