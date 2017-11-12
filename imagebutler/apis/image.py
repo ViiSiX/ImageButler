@@ -11,6 +11,7 @@ from werkzeug.datastructures import FileStorage
 parser = reqparse.RequestParser()
 parser.add_argument('username', required=True, type=str)
 parser.add_argument('password', required=True, type=str)
+parser.add_argument('description', required=False, type=str)
 parser.add_argument('file', required=True,
                     type=FileStorage,
                     location='files')
@@ -29,7 +30,8 @@ class Image(Resource):
         if user.password != args.password:
             return {'return': {'error': 'Authentication failed!'}}
 
-        im = ImageModel(args.file, user.user_id)
+        im = ImageModel(args.file, user.user_id,
+                        file_description=args.description)
         db.session.add(im)
         db.session.commit()
         return {'return': {'success': {

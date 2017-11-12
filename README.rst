@@ -45,6 +45,20 @@ Database Init
     flask db migrate
     flask db upgrade
 
+**Note:**
+- For MySQL and MariaDB please don't create your database in
+*utf8_bin* collate since it will break the application.
+- Also for MySQL and MariaDB, after run the *migrate* command,
+go and edit your migrations/versions/<some-hex>_.py
+
+.. code-block:: python
+
+    from sqlalchemy.dialects.mysql import LONGBLOB
+    # ...
+    # ... replace the old fileContent line with
+    sa.Column('fileContent', LONGBLOB(), nullable=False),
+    # ...
+
 Run
 ---
 
@@ -70,9 +84,11 @@ For example we use cURL to upload the image.
 
     curl -X POST \
         http://image.local-domain:5000/api/v0/image \
-            -F file=@/path/to/your/image.jpg \
-            -F username=df40767b-66b9-4b73-954d-3c0477abbe57 \
-            -F 'password=phJi29Y20icaFQr2hR13PmQxw/YE9r4UBvOS6KEugnQLEXz+70qi/NNZ+i2U/713eG/VIRfnIkyCNAC8Qy7c9LqFH1QUUBzKgFsukKUpekK5OT57jUoEM/Tr0mWPfKMT'
+        -H 'content-type: multipart/form-data' \
+        -F 'file=@/path/to/your/image.png;type=image/png' \
+        -F username=1a339c02-404a-4b66-9fbb-cb30fb417c14 \
+        -F 'password=knwAAOfLBcnkWzGxo0G/ZUzq9ukLb+gf5H/1nmPr7BE+im03qZarW4TvwVepYmi/cg9dEw+N4HDfLqQRfXBSdNawy7YkOQgwOYiRRq3t2PSjYd+Pme4SrMWUE1BYW5rt' \
+        -F 'description=Image #1'
 
 We got the result:
 

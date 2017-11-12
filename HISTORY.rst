@@ -1,6 +1,14 @@
 History
 =======
 
+0.0.2 (Nov 13th, 2017)
+----------------------
+
+- Support for problem with MySQL/MariaDB and utf8_bin collation
+- Update API for adding image description
+- Update document
+- Add Flask-Cors
+- Include init.d script for Debian
 
 0.0.1 (Nov 11th, 2017)
 ----------------------

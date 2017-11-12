@@ -22,11 +22,12 @@ def validate_email(email):
 def validate_mime(mime):
     """Raise exception if MIME does not match image/*."""
 
-    image_re = re.compile('image/*')
+    image_re = re.compile(r'image/*')
     if image_re.match(mime):
         return
     else:
-        raise TypeError('Uploaded file is not an image!')
+        raise TypeError('Uploaded file is not an image! (%s)'
+                        % mime)
 
 
 def generate_uuid():

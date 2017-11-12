@@ -1,1 +1,5 @@
-include README.rst LICENSE HISTORY.rst
+include README.rst LICENSE AUTHORS HISTORY.rst
+include *.dist
+include requirements.txt
+
+graft scripts

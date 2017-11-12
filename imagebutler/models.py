@@ -5,6 +5,7 @@ from flask_login import UserMixin
 from imagebutler import utils
 from werkzeug.datastructures import FileStorage
 from PIL import Image
+from sqlalchemy.dialects.mysql import LONGBLOB
 from .imagebutler import db, config
 from .types import ImageServingObject
 
@@ -18,7 +19,7 @@ class CustomModelMixin(object):
                              onupdate=datetime.datetime.now,
                              default=datetime.datetime.now)
     version = db.Column(db.Integer, index=False, nullable=False)
-    
+
 
 class UserModel(UserMixin, CustomModelMixin, db.Model):
     """imagebutler.models.UserModel"""
@@ -29,8 +30,8 @@ class UserModel(UserMixin, CustomModelMixin, db.Model):
     # Columns definition
     user_id = db.Column('id', db.Integer,
                         primary_key=True, autoincrement=True)
-    email = db.Column(db.String(255), index=True, unique=True, nullable=False)
-    user_name = db.Column('userName', db.String(255), 
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    user_name = db.Column('userName', db.String(36, convert_unicode=False),
                           index=True, unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     is_active = db.Column('isActive', db.Boolean,
@@ -39,7 +40,7 @@ class UserModel(UserMixin, CustomModelMixin, db.Model):
 
     # Relationships
     images = db.relationship('ImageModel', backref='UserModel', lazy='joined')
-    
+
     def __init__(self, user_email):
         """
         Constructor for User class.
@@ -52,12 +53,12 @@ class UserModel(UserMixin, CustomModelMixin, db.Model):
         self.user_name = utils.generate_uuid()
         self.password = utils.generate_password()
         self.version = config['IMAGEBUTLER_MODELS_VERSION']['User']
-        
+
     @property
     def is_anonymous(self):
         """Return True if user is anonymous - Flask-Login method."""
         return False
-    
+
     def get_id(self):
         """Get the user id in unicode string."""
         try:
@@ -68,7 +69,7 @@ class UserModel(UserMixin, CustomModelMixin, db.Model):
     def change_password(self):
         """Set new password for this user."""
         self.password = utils.generate_password()
-        
+
     def __repr__(self):
         """Print the User instance."""
         return '<User {email} - Id {id}>'.format(
@@ -82,21 +83,23 @@ class ImageModel(CustomModelMixin, db.Model):
 
     # Table name
     __tablename__ = 'image'
-    
+
     # Columns definition
     image_id = db.Column('id', db.Integer,
                          primary_key=True, autoincrement=True)
-    file_name = db.Column('fileName', db.String(255),
+    file_name = db.Column('fileName', db.String(50),
                           index=True, nullable=False)
     file_description = db.Column('fileDescription', db.UnicodeText,
                                  nullable=True)
     file_mime = db.Column('fileMIME', db.String(55),
                           nullable=False)
-    file_content = db.Column('fileContent', db.LargeBinary,
+    file_content = db.Column('fileContent',
+                             db.LargeBinary().
+                             with_variant(LONGBLOB, "mysql"),
                              nullable=False)
     file_exif = db.Column('fileEXIF', db.Binary,
                           nullable=True)
-    file_checksum = db.Column('fileChecksum', db.String(255),
+    file_checksum = db.Column('fileChecksum', db.String(64),
                               nullable=False)
     user_id = db.Column('userId', db.Integer,
                         db.ForeignKey('user.id'), nullable=False)

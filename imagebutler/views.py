@@ -1,6 +1,7 @@
 """Docstring for image_butler.views module."""
 
 from flask import jsonify
+from flask_cors import cross_origin
 from .imagebutler import app, rdb
 from .models import ImageModel
 from .job_workers import worker_do_cache_redis
@@ -11,11 +12,12 @@ from .job_workers import worker_do_cache_redis
 @app.route('/serve/image')
 def index_view():
     """Return a JSON that specific what will this application do."""
-    
+
     return jsonify({
         'application': 'ImageButler',
-        'description': 'This application allow user to upload images using REST API'
-                       ' and serving those images to the Internet users.',
+        'description': 'This application allow user to upload images using '
+                       'REST API and serving those images to the Internet '
+                       'users.',
         'versions': {
             'api': '0'
         }
@@ -23,6 +25,7 @@ def index_view():
 
 
 @app.route('/serve/image/<int:user_id>/<string:file_name>')
+@cross_origin()
 def image_view(user_id, file_name):
     queue = rdb.queue['serving']
     try:
