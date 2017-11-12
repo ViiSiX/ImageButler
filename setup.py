@@ -31,6 +31,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'Flask',
+        'Flask-Cors',
         'Flask-Restful',
         'Flask-SQLAlchemy',
         'Flask-Migrate',
