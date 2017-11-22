@@ -53,7 +53,7 @@ def thumbnail_view(user_id, file_name):
     queue = rdb.queue['serving']
     try:
         cached_object = queue.fetch_job(file_name).result
-        return cached_object.make_response()
+        return cached_object.make_response(is_thumbnail=True)
     except AttributeError:
         im = ImageModel.query. \
             filter_by(user_id=user_id, file_name=file_name).first()

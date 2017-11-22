@@ -18,9 +18,9 @@ parser.add_argument('file', required=True,
 
 
 class Image(Resource):
-    """Image REST API. POST for upload an image."""
+    """Image REST API. PUT for upload a new image."""
 
-    def post(self):
+    def put(self):
         args = parser.parse_args()
         user = UserModel.query.filter_by(user_name=args.username).first()
 
