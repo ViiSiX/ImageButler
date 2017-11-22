@@ -3,7 +3,7 @@ Upload files using this API. For prototype the authentication way
 is username and password. Later we can use something like JWT or PEM file.
 """
 
-from .apis import Resource, reqparse, config
+from .apis import Resource, reqparse
 from ..models import db, ImageModel, UserModel
 from werkzeug.datastructures import FileStorage
 
