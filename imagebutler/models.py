@@ -139,9 +139,7 @@ class ImageModel(CustomModelMixin, db.Model):
 
         # Set thumbnail into the model
         self.file_thumbnail = self.gen_thumbnail(image)
-
         image.close()
-        image_sio.close()
 
     def gen_thumbnail(self, image_instance=None):
         """

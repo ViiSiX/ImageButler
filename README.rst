@@ -82,7 +82,7 @@ For example we use cURL to upload the image.
 
 .. code-block:: bash
 
-    curl -X POST \
+    curl -X PUT \
         http://image.local-domain:5000/api/v0/image \
         -H 'content-type: multipart/form-data' \
         -F 'file=@/path/to/your/image.png;type=image/png' \
