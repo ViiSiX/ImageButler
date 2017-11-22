@@ -27,6 +27,7 @@ setup(
     entry_points="""
         [flask.commands]
         user=imagebutler.commands:user
+        image=imagebutler.commands:image 
     """,
     include_package_data=True,
     install_requires=[

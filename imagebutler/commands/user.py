@@ -1,6 +1,6 @@
 import click
-from .models import UserModel
-from .imagebutler import db
+from ..models import UserModel
+from ..imagebutler import db
 from sqlalchemy import exc as sa_exc
 
 
