@@ -14,10 +14,12 @@ Mako==1.0.7
 MarkupSafe==1.0
 olefile==0.44
 Pillow==4.3.0
+progressbar2==3.34.3
 psutil==5.4.0
 pycrypto==2.6.1
 python-dateutil==2.6.1
 python-editor==1.0.3
+python-utils==2.2.0
 pytz==2017.2
 redis==2.10.6
 redis-collections==0.4.2

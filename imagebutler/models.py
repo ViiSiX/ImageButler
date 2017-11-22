@@ -99,6 +99,8 @@ class ImageModel(CustomModelMixin, db.Model):
                              nullable=False)
     file_exif = db.Column('fileEXIF', db.Binary,
                           nullable=True)
+    file_thumbnail = db.Column('fileThumbnail', db.Binary,
+                               nullable=True)
     file_checksum = db.Column('fileChecksum', db.String(64),
                               nullable=False)
     user_id = db.Column('userId', db.Integer,
@@ -129,11 +131,43 @@ class ImageModel(CustomModelMixin, db.Model):
         image = Image.open(file.stream)
         image_sio = utils.BytesIO()
         image.save(image_sio, format=image.format)
-
+        # Set image values into the model
         self.file_exif = utils.get_image_exif(image)
         self.file_content = image_sio.getvalue()
         self.file_checksum = utils.get_checksum(self.file_content)
+        image_sio.close()
+
+        # Set thumbnail into the model
+        self.file_thumbnail = self.gen_thumbnail(image)
+
+        image.close()
+        image_sio.close()
+
+    def gen_thumbnail(self, image_instance=None):
+        """
+
+        :param image_instance:
+        :type image_instance: PIL.Image.Image
+        :return: BytesIO object
+        """
+
+        is_close_image_instance = False
+        if not image_instance:
+            image_instance = Image.open(utils.BytesIO(self.file_content))
+            is_close_image_instance = True
+
+        image_sio = utils.BytesIO()
+        image_instance.thumbnail(
+            config['IMAGEBUTLER_MAX_THUMBNAIL'],
+            Image.ANTIALIAS
+        )
+        image_instance.save(image_sio, format=image_instance.format)
+        if is_close_image_instance:
+            image_instance.close()
+        return image_sio.getvalue()
 
     @property
     def serving_object(self):
-        return ImageServingObject(self.file_mime, self.file_content)
+        return ImageServingObject(self.file_mime,
+                                  self.file_content,
+                                  self.file_thumbnail)

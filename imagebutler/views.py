@@ -45,3 +45,26 @@ def image_view(user_id, file_name):
             return im.serving_object.make_response()
         else:
             return jsonify({'error': 'Not a single image found!'})
+
+
+@app.route('/serve/thumbnail/<int:user_id>/<string:file_name>')
+@cross_origin()
+def thumbnail_view(user_id, file_name):
+    queue = rdb.queue['serving']
+    try:
+        cached_object = queue.fetch_job(file_name).result
+        return cached_object.make_response()
+    except AttributeError:
+        im = ImageModel.query. \
+            filter_by(user_id=user_id, file_name=file_name).first()
+        if im is not None:
+            if rdb.worker_process is None:
+                rdb.start_worker()
+            queue.enqueue(
+                f=worker_do_cache_redis,
+                kwargs={'caching_object': im.serving_object},
+                job_id=file_name
+            )
+            return im.serving_object.make_response(is_thumbnail=True)
+        else:
+            return jsonify({'error': 'Not a single image found!'})
