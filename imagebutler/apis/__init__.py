@@ -1,3 +1,5 @@
+"""This module stores all the REST API of ImageButler."""
+
 from .apis import api
 from .ping import Ping
 from .image import Image

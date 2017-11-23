@@ -103,6 +103,8 @@ class ImageModel(CustomModelMixin, db.Model):
                                nullable=True)
     file_checksum = db.Column('fileChecksum', db.String(64),
                               nullable=False)
+    is_deleted = db.Column('isDeleted', db.Boolean,
+                           nullable=False, default=False)
     user_id = db.Column('userId', db.Integer,
                         db.ForeignKey('user.id'), nullable=False)
 
