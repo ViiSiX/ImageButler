@@ -4,6 +4,9 @@ from flask import make_response
 
 
 class ImageServingObject(object):
+    """Class that act like a middle layer to wrap up the Image Model. Provide
+    the response for Flask to return to the client. This class will be stored
+    in Redis database after the first serve to improve serving performance."""
 
     def __init__(self, mime, content, thumbnail):
         self.mime = mime

@@ -1,5 +1,6 @@
 from .apis import Resource, reqparse, config
-from ..models import db, ImageModel, UserModel
+from ..models import ImageModel, UserModel
+from ..utils import user_identity_check
 
 
 parser = reqparse.RequestParser()
@@ -15,11 +16,9 @@ class Images(Resource):
         args = parser.parse_args()
         user = UserModel.query.filter_by(user_name=args.username).first()
 
-        # For the first prototype let's just using this method.
-        if user is None:
-            return {'return': {'error': 'User does not existed!'}}
-        if user.password != args.password:
-            return {'return': {'error': 'Authentication failed!'}}
+        uic = user_identity_check(user, args.password)
+        if not uic[0]:
+            return uic[1]
 
         return_object = {}
 
