@@ -7,7 +7,7 @@ from werkzeug.datastructures import FileStorage
 from PIL import Image
 from sqlalchemy.dialects.mysql import LONGBLOB
 from .imagebutler import db, config
-from .types import ImageServingObject
+from .serving_objects import ImageServingObject
 
 
 class CustomModelMixin(object):
@@ -71,7 +71,7 @@ class UserModel(UserMixin, CustomModelMixin, db.Model):
         self.password = utils.generate_password()
 
     def __repr__(self):
-        """Print the User instance."""
+        """Print the UserModel instance."""
         return '<User {email} - Id {id}>'.format(
             email=self.email,
             id=self.user_id
@@ -110,9 +110,14 @@ class ImageModel(CustomModelMixin, db.Model):
 
     def __init__(self, file, user_id, file_description=None):
         """
+        Constructor for ImageModel class.
 
-        :param file:
+        :param file: FileStorage object receive from the request.
         :type file: FileStorage
+        :param user_id: to which user this image belong.
+        :param file_description: description of the uploaded file. The
+        description should go along with other information in the request. If
+        not provided file description will be original file name instead.
         """
 
         utils.validate_mime(file.mimetype)
@@ -143,29 +148,39 @@ class ImageModel(CustomModelMixin, db.Model):
 
     def gen_thumbnail(self, image_instance=None):
         """
+        Generate thumbnail of an given Image object.
 
-        :param image_instance:
+        :param image_instance: Given image object that will be use to
+        generate new thumbnail.
         :type image_instance: PIL.Image.Image
         :return: BytesIO object
         """
 
-        is_close_image_instance = False
         if not image_instance:
-            image_instance = Image.open(utils.BytesIO(self.file_content))
-            is_close_image_instance = True
+            temp_image = Image.open(utils.BytesIO(self.file_content))
+        else:
+            temp_image = image_instance.copy()
 
         image_sio = utils.BytesIO()
-        image_instance.thumbnail(
+        temp_image.thumbnail(
             config['IMAGEBUTLER_MAX_THUMBNAIL'],
             Image.ANTIALIAS
         )
-        image_instance.save(image_sio, format=image_instance.format)
-        if is_close_image_instance:
-            image_instance.close()
+        temp_image.save(image_sio, format=temp_image.format)
+        temp_image.close()
         return image_sio.getvalue()
 
     @property
     def serving_object(self):
+        """The model will not direct serving data to Flask but rather a
+        medium class."""
         return ImageServingObject(self.file_mime,
                                   self.file_content,
                                   self.file_thumbnail)
+
+    def __repr__(self):
+        """Print the ImageModel instance."""
+        return '<Image {file_name} - User Id {user_id}>'.format(
+            file_name=self.file_name,
+            user_id=self.user_id
+        )

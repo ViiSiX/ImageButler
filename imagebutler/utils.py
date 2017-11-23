@@ -58,8 +58,10 @@ def get_checksum(data):
 
 def get_image_exif(image):
     """
+    Get and return exif information if it is available.
 
-    :param image:
+    :param image: Image object.
+    :type image: PIL.Image.Image
     :return:
     """
 
@@ -78,9 +80,19 @@ def get_image_exif(image):
         return None
 
 
+def user_identity_check(user, password):
+    """Check if user is not null and have exact password as the given ones."""
+    if user is None:
+        return 0, {'return': {'error': 'User does not existed!'}}
+    if user.password != password:
+        return 0, {'return': {'error': 'Authentication failed!'}}
+    return 1,
+
+
 def generate_runtime():
     """
     Generate an epoch timestamp in milliseconds at the this function run.
+
     :return: Epoch timestamp in milliseconds.
     """
     return int(time.time() * 1000)

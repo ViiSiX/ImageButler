@@ -27,6 +27,8 @@ def index_view():
 @app.route('/serve/image/<int:user_id>/<string:file_name>')
 @cross_origin()
 def image_view(user_id, file_name):
+    """Return image following requests."""
+
     queue = rdb.queue['serving']
     try:
         cached_object = queue.fetch_job(file_name).result
@@ -50,6 +52,8 @@ def image_view(user_id, file_name):
 @app.route('/serve/thumbnail/<int:user_id>/<string:file_name>')
 @cross_origin()
 def thumbnail_view(user_id, file_name):
+    """Return thumbnail of a image following requests."""
+
     queue = rdb.queue['serving']
     try:
         cached_object = queue.fetch_job(file_name).result

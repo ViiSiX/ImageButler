@@ -2,6 +2,12 @@
 
 
 class BaseConfig:
+    """
+    These are some default configuration that will be loaded into any
+    environment. For specific default configuration, please create other
+    class.
+    """
+
     # Application
     APP_NAME = "Image Butler"
     APP_SYSTEM_ERROR_SUBJECT_LINE = APP_NAME + " error"
