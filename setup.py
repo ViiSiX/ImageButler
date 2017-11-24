@@ -39,7 +39,8 @@ setup(
         'Flask-Redislite',
         'Flask-Login',
         'pycrypto',
-        'Pillow'
+        'Pillow',
+        'progressbar2'
     ],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',

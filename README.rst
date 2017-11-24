@@ -137,8 +137,21 @@ Then we got the similar result of create new image:
         }
     }
 
-Get images of yourself
-----------------------
+Delete an image
+---------------
+
+.. code-block:: bash
+    curl -X DELETE \
+          http://image.local-domain:5000/api/v0/image \
+          -H 'content-type: application/json' \
+          -d '{
+            "username": "1a339c02-404a-4b66-9fbb-cb30fb417c14",
+            "password": "knwAAOfLBcnkWzGxo0G/ZUzq9ukLb+gf5H/1nmPr7BE+im03qZarW4TvwVepYmi/cg9dEw+N4HDfLqQRfXBSdNawy7YkOQgwOYiRRq3t2PSjYd+Pme4SrMWUE1BYW5rt",
+            "filename": "ca4ffe9f192f4f358e4981ceaafd8068.jpg",
+        }'
+
+Get your images
+---------------
 
 .. code-block:: bash
 

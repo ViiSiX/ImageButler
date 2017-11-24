@@ -3,3 +3,4 @@ include *.dist
 include requirements.txt
 
 graft scripts
+graft tests
