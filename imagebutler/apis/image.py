@@ -34,16 +34,21 @@ post_parser.add_argument('password', required=True, type=str)
 def image_return_skeleton(image_object):
     """This function will return a dict object that will be fit into
     a success response."""
-    return {'return': {'success': {
-            'file_name': image_object.file_name,
-            'path': '/serve/image/{0}/{1}'.format(
-                image_object.user_id, image_object.file_name
-            ),
-            'thumbnail': '/serve/thumbnail/{0}/{1}'.format(
-                image_object.user_id, image_object.file_name
-            ),
-            'description': image_object.file_description
-        }}}
+
+    return {
+        'return': {
+            'success': {
+                'file_name': image_object.file_name,
+                'path': '/serve/image/{0}/{1}'.format(
+                    image_object.user_id, image_object.file_name
+                ),
+                'thumbnail': '/serve/thumbnail/{0}/{1}'.format(
+                    image_object.user_id, image_object.file_name
+                ),
+                'description': image_object.file_description
+            }
+        }
+    }
 
 
 class Image(Resource):

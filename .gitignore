@@ -10,3 +10,7 @@ dist
 *.conf
 
 migrations
+
+.cache
+.coverage
+tests/.unittest/

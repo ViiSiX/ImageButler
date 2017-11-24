@@ -1,0 +1,17 @@
+#!/bin/bash
+# This script will be used to run unit tests.
+
+BASEDIR=$(dirname $(dirname "$0"))
+
+# pep8 has been moved to pycodestyle, but pytest-pep8 has been
+# inactive for one year. So we have to use them in parallel.
+py.test "$BASEDIR"/tests \
+    --pep8 "$BASEDIR"/imagebutler \
+    --cov "$BASEDIR"/imagebutler \
+    --cov-report term-missing
+
+echo "================"
+echo "PEP8 violations:"
+echo "================"
+pycodestyle --first "$BASEDIR"/imagebutler
+echo "================"
