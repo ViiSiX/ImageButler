@@ -1,3 +1,4 @@
+# coding=utf8
 import pytest
 import uuid
 import time
@@ -132,7 +133,8 @@ def test_generate_password():
     """Test generate_password function."""
 
     assert utils.generate_password()
-    assert isinstance(utils.generate_password(), str)
+    assert isinstance(utils.generate_password(), str) or \
+        isinstance(utils.generate_password(), basestring)
 
 
 def test_get_image_exif(sample_pil_jpeg_object_with_exif,
