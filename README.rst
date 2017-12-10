@@ -112,6 +112,7 @@ Update your image's description
 -------------------------------
 
 .. code-block:: bash
+
     curl -X POST \
           http://image.local-domain:5000/api/v0/image \
           -H 'content-type: application/json' \
@@ -141,6 +142,7 @@ Delete an image
 ---------------
 
 .. code-block:: bash
+
     curl -X DELETE \
           http://image.local-domain:5000/api/v0/image \
           -H 'content-type: application/json' \
