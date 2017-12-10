@@ -2,7 +2,7 @@
 
 import datetime
 from flask_login import UserMixin
-from imagebutler import utils
+from . import utils
 from werkzeug.datastructures import FileStorage
 from PIL import Image
 from sqlalchemy.dialects.mysql import LONGBLOB
