@@ -2,12 +2,12 @@
 
 import datetime
 from flask_login import UserMixin
-from imagebutler import utils
+from . import utils
 from werkzeug.datastructures import FileStorage
 from PIL import Image
 from sqlalchemy.dialects.mysql import LONGBLOB
 from .imagebutler import db, config
-from .types import ImageServingObject
+from .serving_objects import ImageServingObject
 
 
 class CustomModelMixin(object):
@@ -71,7 +71,7 @@ class UserModel(UserMixin, CustomModelMixin, db.Model):
         self.password = utils.generate_password()
 
     def __repr__(self):
-        """Print the User instance."""
+        """Print the UserModel instance."""
         return '<User {email} - Id {id}>'.format(
             email=self.email,
             id=self.user_id
@@ -99,8 +99,12 @@ class ImageModel(CustomModelMixin, db.Model):
                              nullable=False)
     file_exif = db.Column('fileEXIF', db.Binary,
                           nullable=True)
+    file_thumbnail = db.Column('fileThumbnail', db.Binary,
+                               nullable=True)
     file_checksum = db.Column('fileChecksum', db.String(64),
                               nullable=False)
+    is_deleted = db.Column('isDeleted', db.Boolean,
+                           nullable=False, default=False)
     user_id = db.Column('userId', db.Integer,
                         db.ForeignKey('user.id'), nullable=False)
 
@@ -108,9 +112,14 @@ class ImageModel(CustomModelMixin, db.Model):
 
     def __init__(self, file, user_id, file_description=None):
         """
+        Constructor for ImageModel class.
 
-        :param file:
+        :param file: FileStorage object receive from the request.
         :type file: FileStorage
+        :param user_id: to which user this image belong.
+        :param file_description: description of the uploaded file. The
+        description should go along with other information in the request. If
+        not provided file description will be original file name instead.
         """
 
         utils.validate_mime(file.mimetype)
@@ -129,11 +138,51 @@ class ImageModel(CustomModelMixin, db.Model):
         image = Image.open(file.stream)
         image_sio = utils.BytesIO()
         image.save(image_sio, format=image.format)
-
+        # Set image values into the model
         self.file_exif = utils.get_image_exif(image)
         self.file_content = image_sio.getvalue()
         self.file_checksum = utils.get_checksum(self.file_content)
+        image_sio.close()
+
+        # Set thumbnail into the model
+        self.file_thumbnail = self.gen_thumbnail(image)
+        image.close()
+
+    def gen_thumbnail(self, image_instance=None):
+        """
+        Generate thumbnail of an given Image object.
+
+        :param image_instance: Given image object that will be use to
+        generate new thumbnail.
+        :type image_instance: PIL.Image.Image
+        :return: BytesIO object
+        """
+
+        if not image_instance:
+            temp_image = Image.open(utils.BytesIO(self.file_content))
+        else:
+            temp_image = image_instance.copy()
+
+        image_sio = utils.BytesIO()
+        temp_image.thumbnail(
+            config['IMAGEBUTLER_MAX_THUMBNAIL'],
+            Image.ANTIALIAS
+        )
+        temp_image.save(image_sio, format=temp_image.format)
+        temp_image.close()
+        return image_sio.getvalue()
 
     @property
     def serving_object(self):
-        return ImageServingObject(self.file_mime, self.file_content)
+        """The model will not direct serving data to Flask but rather a
+        medium class."""
+        return ImageServingObject(self.file_mime,
+                                  self.file_content,
+                                  self.file_thumbnail)
+
+    def __repr__(self):
+        """Print the ImageModel instance."""
+        return '<Image {file_name} - User Id {user_id}>'.format(
+            file_name=self.file_name,
+            user_id=self.user_id
+        )

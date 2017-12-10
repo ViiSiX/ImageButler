@@ -27,6 +27,7 @@ setup(
     entry_points="""
         [flask.commands]
         user=imagebutler.commands:user
+        image=imagebutler.commands:image 
     """,
     include_package_data=True,
     install_requires=[
@@ -38,7 +39,8 @@ setup(
         'Flask-Redislite',
         'Flask-Login',
         'pycrypto',
-        'Pillow'
+        'Pillow',
+        'progressbar2'
     ],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',

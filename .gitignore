@@ -1,5 +1,5 @@
-build
-dist
+build/
+dist/
 
 *.pyc
 *.egg-info
@@ -9,4 +9,10 @@ dist
 *.pid
 *.conf
 
-migrations
+migrations/
+
+.coverage
+.python-version
+.cache/
+.tox/
+tests/.unittest/

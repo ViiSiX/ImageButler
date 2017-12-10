@@ -1,4 +1,7 @@
 SQLALCHEMY_DATABASE_URI = 'sqlite:////<path-to-your>/ImageButler.db'
 SERVER_NAME = 'viisix.local:5000'
-REDISLITE_PATH = ''<path-to-your>/ImageButler.rdb'
+REDISLITE_PATH = '<path-to-your>/ImageButler.rdb'
 REDISLITE_WORKER_PID = '<path-to-your>/workers.pid'
+
+IMAGEBUTLER_MAX_THUMBNAIL = 150, 150
+IMAGEBUTLER_API_IMAGES_LIMIT = 100

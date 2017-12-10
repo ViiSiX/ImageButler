@@ -22,12 +22,16 @@ def validate_email(email):
 def validate_mime(mime):
     """Raise exception if MIME does not match image/*."""
 
-    image_re = re.compile(r'image/*')
-    if image_re.match(mime):
-        return
-    else:
-        raise TypeError('Uploaded file is not an image! (%s)'
-                        % mime)
+    image_re = re.compile(r'^image/[\w\-.]+$')
+    try:
+        if image_re.match(mime):
+            return
+        else:
+            raise TypeError(
+                'Uploaded file is not an image! ({0})'.format(mime)
+            )
+    except TypeError:
+        raise TypeError('MIME should be string, not {0}'.format(type(mime)))
 
 
 def generate_uuid():
@@ -58,13 +62,15 @@ def get_checksum(data):
 
 def get_image_exif(image):
     """
+    Get and return exif information if it is available.
 
-    :param image:
-    :return:
+    :param image: Image object.
+    :type image: PIL.Image.Image
+    :return: exif data or None.
     """
 
     try:
-        exif = image._get_exif()  # There is not public method for this.
+        exif = image._getexif()  # There is not public method for this.
 
         if exif is not None:
             exif_io = BytesIO()
@@ -78,9 +84,28 @@ def get_image_exif(image):
         return None
 
 
+def user_identity_check(user, password):
+    """
+    Check if user is not null and have exact password as the given ones.
+
+    For now we just store the plain text password, do not need to hash it.
+    :param user: object that have username and password attribute.
+    :type user: models.UserModel
+    :param password: plaintext password string.
+    :type password: str
+    """
+
+    if user is None:
+        return 0, {'return': {'error': 'User does not existed!'}}
+    if user.password != password:
+        return 0, {'return': {'error': 'Authentication failed!'}}
+    return 1,
+
+
 def generate_runtime():
     """
     Generate an epoch timestamp in milliseconds at the this function run.
+
     :return: Epoch timestamp in milliseconds.
     """
     return int(time.time() * 1000)
