@@ -11,6 +11,5 @@ script:
   - py.test tests --pep8 imagebutler --cov imagebutler --cov-report term-missing
 branches:
   only:
-    - master
-    - /^R\/\d+\.\d+\.\d+$/
+    - /^R\/\d+\.\d+(\.\d+)?$/
     - /^D\/\d+\.\d+\.\d+\/.*travis$/
