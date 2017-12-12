@@ -23,7 +23,7 @@ setup(
     url='https://viisix.space/projects/image-butler/',
     description='Simple images serving service,',
     long_description=description,
-    packages=['imagebutler', 'imagebutler.apis'],
+    packages=['imagebutler', 'imagebutler.apis', 'imagebutler.commands'],
     entry_points="""
         [flask.commands]
         user=imagebutler.commands:user
