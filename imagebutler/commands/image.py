@@ -36,5 +36,5 @@ def thumbnail_regen(**kwargs):
             bar.update(images_progressed)
 
     else:
-        click.echo('Usage: flask image gen_thumbnail all|missing',
+        click.echo('Usage: flask image gen_thumbnail --type all|missing',
                    err=True)
