@@ -5,6 +5,9 @@ Simple image server built on Flask.
 
 Developed Python version: Python 3.6.
 
+.. image:: https://travis-ci.org/ViiSiX/ImageButler.svg?branch=R%2F0.1
+    :target: https://travis-ci.org/ViiSiX/ImageButler
+
 Installation
 ------------
 
