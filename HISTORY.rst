@@ -1,6 +1,12 @@
 History
 =======
 
+0.0.4 (Dec 13th, 2017)
+----------------------
+
+- Hot fix #26 and #28
+- Added option to config max image file size
+
 0.0.3 (Dec 10th, 2017)
 ----------------------
 

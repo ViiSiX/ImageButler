@@ -29,6 +29,10 @@ Create *image_butler.conf* referring following example:
     REDISLITE_PATH = '<path-to-your>/ImageButler.rdb'
     REDISLITE_WORKER_PID = '<path-to-your>/workers.pid'
 
+    IMAGEBUTLER_MAX_THUMBNAIL = 150, 150
+    IMAGEBUTLER_API_IMAGES_LIMIT = 5
+    IMAGEBUTLER_MAX_IMAGE_SIZE = '1M'
+
 Export environment variables:
 
 .. code-block:: bash
