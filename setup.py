@@ -40,7 +40,8 @@ setup(
         'Flask-Login',
         'pycrypto',
         'Pillow',
-        'progressbar2'
+        'progressbar2',
+        'piexif'
     ],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
