@@ -2,7 +2,10 @@
 import pytest
 import uuid
 import time
+import pickle
+import piexif
 from Crypto import Random
+from PIL import Image
 from imagebutler import utils
 
 
@@ -140,6 +143,74 @@ def test_generate_password():
 def test_get_image_exif(sample_pil_jpeg_object_with_exif,
                         sample_pil_jpeg_object_no_exif,
                         sample_pil_png_object):
-    assert utils.get_image_exif(sample_pil_jpeg_object_with_exif)
-    assert utils.get_image_exif(sample_pil_jpeg_object_no_exif) is None
+    """Test get_image_exif function to return exif data or None."""
+
     assert utils.get_image_exif(sample_pil_png_object) is None
+    assert utils.get_image_exif(sample_pil_jpeg_object_no_exif) is None
+
+    exif = utils.get_image_exif(sample_pil_jpeg_object_with_exif)
+    assert exif
+    # Ensure that the function return right format
+    deserialize_exif = pickle.loads(exif)
+    assert deserialize_exif
+    assert piexif.dump(deserialize_exif)
+
+
+def test_process_uploaded_image_with_exif(
+        sample_pil_jpeg_object_with_exif
+):
+    """Test process_uploaded_image with image having exif."""
+
+    ret_1 = utils.process_uploaded_image(
+        sample_pil_jpeg_object_with_exif,
+        '1M'
+    )
+    assert isinstance(ret_1[0], Image.Image)
+    assert ret_1[1]
+    assert ret_1[2]
+    assert ret_1[3] < 1 * 1024 * 1024
+    assert ret_1[4]
+
+    ret_2 = utils.process_uploaded_image(
+        sample_pil_jpeg_object_with_exif,
+        '512K'
+    )
+    # Reserve place for EXIF
+    assert isinstance(ret_2[0], Image.Image)
+    assert ret_2[1]
+    assert ret_2[2]
+    assert ret_2[3] < 512 * 1024 * 1.05
+    assert ret_2[4]
+
+    ret_3 = utils.process_uploaded_image(
+        sample_pil_jpeg_object_with_exif,
+        '0'
+    )
+    assert isinstance(ret_3[0], Image.Image)
+    assert ret_3[1]
+    assert ret_3[2]
+    assert ret_3[4]
+
+
+def test_process_uploaded_image_without_exif(
+        sample_pil_jpeg_object_no_exif
+):
+    """Test process_uploaded_image with image not having exif."""
+
+    ret_1 = utils.process_uploaded_image(
+        sample_pil_jpeg_object_no_exif,
+        '1M'
+    )
+    assert isinstance(ret_1[0], Image.Image)
+    assert ret_1[1]
+    assert ret_1[2]
+    assert ret_1[3] < 1 * 1024 * 1024
+    assert ret_1[4] is None
+
+    ret_2 = utils.process_uploaded_image(
+        sample_pil_jpeg_object_no_exif,
+        '256K'
+    )
+    # Reserve place for EXIF
+    assert ret_2[3] < 256 * 1024 * 1.05
+    assert ret_2[4] is None
