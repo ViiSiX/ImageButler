@@ -1,11 +1,13 @@
+"""This module provide support functions to other modules in the project."""
+
 import time
 import re
 import uuid
 import base64
 import pickle
+from io import BytesIO
 import piexif
 from PIL import Image
-from io import BytesIO
 from Crypto import Random
 from Crypto.Hash import SHA256
 
@@ -99,8 +101,7 @@ def process_uploaded_image(image, max_size=0):
     if image_exif:
         image_exif_deserialized = pickle.loads(image_exif)
         image.save(image_sio, format=image.format,
-                   exif=piexif.dump(image_exif_deserialized)
-                   )
+                   exif=piexif.dump(image_exif_deserialized))
     else:
         image_exif_deserialized = None
         image.save(image_sio, format=image.format)
@@ -125,7 +126,6 @@ def process_uploaded_image(image, max_size=0):
             int(image_dimension_size[0] * resize_ratio),
             int(image_dimension_size[1] * resize_ratio)
         )
-        print(max_size, image_size, resize_ratio)
         image.thumbnail(new_dimension_size, Image.ANTIALIAS)
         image_dimension_size = image.size
         image_sio.close()
@@ -201,9 +201,8 @@ class Timer(object):
         elif total_time >= 1000:
             return "{seconds} seconds".format(seconds=total_time / 1000)
 
-        else:
-            return "{milliseconds} milliseconds".\
-                format(milliseconds=total_time)
+        return "{milliseconds} milliseconds".\
+            format(milliseconds=total_time)
 
     def spend(self, minutes):
         """

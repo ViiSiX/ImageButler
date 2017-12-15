@@ -3,10 +3,9 @@
 import datetime
 from copy import deepcopy
 from flask_login import UserMixin
-from . import utils
-from werkzeug.datastructures import FileStorage
 from PIL import Image
 from sqlalchemy.dialects.mysql import LONGBLOB
+from . import utils
 from .imagebutler import db, config
 from .serving_objects import ImageServingObject
 
@@ -119,7 +118,7 @@ class ImageModel(CustomModelMixin, db.Model):
         Constructor for ImageModel class.
 
         :param file: FileStorage object receive from the request.
-        :type file: FileStorage
+        :type file: werkzeug.datastructures.FileStorage
         :param user_id: to which user this image belong.
         :param file_description: description of the uploaded file. The
         description should go along with other information in the request. If

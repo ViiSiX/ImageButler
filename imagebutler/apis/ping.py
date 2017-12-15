@@ -5,5 +5,8 @@ from .apis import Resource
 class Ping(Resource):
     """You pong when you are pinged..."""
 
+    response = 'pong'
+
     def get(self):
-        return {'returned': 'pong'}
+        """GET: You pong when you are pinged..."""
+        return {'returned': self.response}

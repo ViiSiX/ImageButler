@@ -31,25 +31,22 @@ def image_view(user_id, file_name):
 
     queue = rdb.queue['serving']
     try:
-        print("Serve from cache")
-        print(queue.fetch_job(file_name).result)
         cached_object = queue.fetch_job(file_name).result
         return cached_object.make_response()
     except AttributeError:
-        print("Serve from DB")
-        im = ImageModel.query.\
+        image = ImageModel.query.\
             filter_by(user_id=user_id,
                       file_name=file_name,
                       is_deleted=False).first()
-        if im is not None:
+        if image is not None:
             if rdb.worker_process is None:
                 rdb.start_worker()
             queue.enqueue(
                 f=worker_do_cache_redis,
-                kwargs={'caching_object': im.serving_object},
+                kwargs={'caching_object': image.serving_object},
                 job_id=file_name
             )
-            return im.serving_object.make_response()
+            return image.serving_object.make_response()
         else:
             return jsonify({'error': 'Not a single image found!'})
 
@@ -64,18 +61,18 @@ def thumbnail_view(user_id, file_name):
         cached_object = queue.fetch_job(file_name).result
         return cached_object.make_response(is_thumbnail=True)
     except AttributeError:
-        im = ImageModel.query. \
+        image = ImageModel.query. \
             filter_by(user_id=user_id,
                       file_name=file_name,
                       is_deleted=False).first()
-        if im is not None:
+        if image is not None:
             if rdb.worker_process is None:
                 rdb.start_worker()
             queue.enqueue(
                 f=worker_do_cache_redis,
-                kwargs={'caching_object': im.serving_object},
+                kwargs={'caching_object': image.serving_object},
                 job_id=file_name
             )
-            return im.serving_object.make_response(is_thumbnail=True)
+            return image.serving_object.make_response(is_thumbnail=True)
         else:
             return jsonify({'error': 'Not a single image found!'})
