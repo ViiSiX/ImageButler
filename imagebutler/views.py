@@ -30,7 +30,7 @@ def index_view():
 def image_view(user_id, file_name):
     """Return image following requests."""
 
-    queue = rdb.queue['serving']
+    queue = rdb.queue['serving'] if rdb else None
     try:
         cached_object = queue.fetch_job(file_name).result
         return cached_object.make_response()
@@ -40,16 +40,16 @@ def image_view(user_id, file_name):
                       file_name=file_name,
                       is_deleted=False).first()
         if image is not None:
-            if rdb.worker_process is None:
-                rdb.start_worker()
-            queue.enqueue(
-                f=worker_do_cache_redis,
-                kwargs={'caching_object': image.serving_object},
-                job_id=file_name
-            )
+            if rdb:
+                if rdb.worker_process is None:
+                    rdb.start_worker()
+                queue.enqueue(
+                    f=worker_do_cache_redis,
+                    kwargs={'caching_object': image.serving_object},
+                    job_id=file_name
+                )
             return image.serving_object.make_response()
-        else:
-            return jsonify({'error': 'Not a single image found!'})
+        return jsonify({'error': 'Not a single image found!'})
 
 
 @app.route('/serve/thumbnail/<int:user_id>/<string:file_name>')
@@ -57,7 +57,7 @@ def image_view(user_id, file_name):
 def thumbnail_view(user_id, file_name):
     """Return thumbnail of a image following requests."""
 
-    queue = rdb.queue['serving']
+    queue = rdb.queue['serving'] if rdb else None
     try:
         cached_object = queue.fetch_job(file_name).result
         return cached_object.make_response(is_thumbnail=True)
@@ -67,13 +67,13 @@ def thumbnail_view(user_id, file_name):
                       file_name=file_name,
                       is_deleted=False).first()
         if image is not None:
-            if rdb.worker_process is None:
-                rdb.start_worker()
-            queue.enqueue(
-                f=worker_do_cache_redis,
-                kwargs={'caching_object': image.serving_object},
-                job_id=file_name
-            )
+            if rdb:
+                if rdb.worker_process is None:
+                    rdb.start_worker()
+                queue.enqueue(
+                    f=worker_do_cache_redis,
+                    kwargs={'caching_object': image.serving_object},
+                    job_id=file_name
+                )
             return image.serving_object.make_response(is_thumbnail=True)
-        else:
-            return jsonify({'error': 'Not a single image found!'})
+        return jsonify({'error': 'Not a single image found!'})

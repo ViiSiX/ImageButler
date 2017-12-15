@@ -16,5 +16,8 @@ app.config.from_envvar('IMAGEBUTLER_CONFIGS', silent=True)
 config = app.config  # pylint: disable=invalid-name
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-rdb = FlaskRedis(app,
-                 rq=True, rq_queues=['serving'])
+if config['IMAGEBUTLER_REDISLITE_CACHE']:
+    rdb = FlaskRedis(app,
+                     rq=True, rq_queues=['serving'])
+else:
+    rdb = None
