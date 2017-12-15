@@ -1,11 +1,14 @@
+"""This module define user supports commands for the application."""
+
 import click
+from sqlalchemy import exc as sa_exc
 from ..models import UserModel
 from ..imagebutler import db
-from sqlalchemy import exc as sa_exc
 
 
 @click.group()
 def user():
+    """Dummy function to add `user` to click group."""
     pass
 
 

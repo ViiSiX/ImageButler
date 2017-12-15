@@ -1,6 +1,7 @@
 alembic==0.9.6
 aniso8601==1.3.0
 apipkg==1.4
+astroid==1.5.3
 click==6.7
 coverage==4.4.2
 execnet==1.5.0
@@ -11,10 +12,13 @@ Flask-Migrate==2.1.1
 Flask-Redislite==0.1.1
 Flask-RESTful==0.3.6
 Flask-SQLAlchemy==2.3.2
+isort==4.2.15
 itsdangerous==0.24
 Jinja2==2.10
+lazy-object-proxy==1.3.1
 Mako==1.0.7
 MarkupSafe==1.0
+mccabe==0.6.1
 olefile==0.44
 pep8==1.7.1
 piexif==1.0.13
@@ -25,6 +29,7 @@ psutil==5.4.0
 py==1.5.2
 pycodestyle==2.3.1
 pycrypto==2.6.1
+pylint==1.7.5
 pytest==3.2.5
 pytest-cache==1.0
 pytest-cov==2.5.1
@@ -42,3 +47,4 @@ SQLAlchemy==1.1.14
 tox==2.9.1
 virtualenv==15.1.0
 Werkzeug==0.12.2
+wrapt==1.10.11
