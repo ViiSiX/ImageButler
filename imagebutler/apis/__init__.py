@@ -6,6 +6,8 @@ from .image import Image
 from .images import Images
 
 
+__version__ = '0'
+
 api.add_resource(Ping, '/ping')
 api.add_resource(Image, '/image')
 api.add_resource(Images, '/images')

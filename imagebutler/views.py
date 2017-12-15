@@ -2,7 +2,7 @@
 
 from flask import jsonify
 from flask_cors import cross_origin
-from .imagebutler import app, rdb
+from .imagebutler import app, rdb, config
 from .models import ImageModel
 from .job_workers import worker_do_cache_redis
 
@@ -19,7 +19,8 @@ def index_view():
                        'REST API and serving those images to the Internet '
                        'users.',
         'versions': {
-            'api': '0'
+            'release': config['VERSION'],
+            'api': config['API_VERSION']
         }
     })
 
