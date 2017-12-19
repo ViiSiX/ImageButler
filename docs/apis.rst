@@ -1,93 +1,22 @@
-ImageButler
-===========
+REST APIs
+=========
 
-Simple image server built on Flask.
+Image
+-----
 
-Developed Python version: Python 3.6.
+APIs with the effect to one single image.
 
-.. image:: https://travis-ci.org/ViiSiX/ImageButler.svg?branch=R%2F0.1
-    :target: https://travis-ci.org/ViiSiX/ImageButler
+GET
+^^^
 
-Installation
-------------
+*Not available.*
 
-Using pip
+PUT
+^^^
 
-.. code-block:: bash
+Used for upload new image.
 
-    pip install ImageButler
-
-Configuration & Environment Variables
--------------------------------------
-
-Create *image_butler.conf* referring following example:
-
-.. code-block:: text
-
-    SQLALCHEMY_DATABASE_URI = 'sqlite:////<path-to-your>/ImageButler.db'
-    SERVER_NAME = 'image.local-domain:5000'
-    REDISLITE_PATH = '<path-to-your>/ImageButler.rdb'
-    REDISLITE_WORKER_PID = '<path-to-your>/workers.pid'
-
-    IMAGEBUTLER_MAX_THUMBNAIL = 150, 150
-    IMAGEBUTLER_API_IMAGES_LIMIT = 5
-    IMAGEBUTLER_MAX_IMAGE_SIZE = '1M'
-
-    IMAGEBUTLER_REDISLITE_CACHE = False
-
-Export environment variables:
-
-.. code-block:: bash
-
-    export FLASK_APP=imagebutler
-    export IMAGEBUTLER_CONFIGS=path/to/your/image_butler.conf
-
-For others configuration please referring to documents of *Flask*,
-*Flask-Login*, *Flask-SQLAlchemy*... (please check *requirements.txt*).
-
-Database Init
--------------
-
-.. code-block:: bash
-
-    flask db init
-    flask db migrate
-    flask db upgrade
-
-**Note:**
-- For MySQL and MariaDB please don't create your database in
-*utf8_bin* collate since it will break the application.
-- Also for MySQL and MariaDB, after run the *migrate* command,
-go and edit your migrations/versions/<some-hex>_.py
-
-.. code-block:: python
-
-    from sqlalchemy.dialects.mysql import LONGBLOB
-    # ...
-    # ... replace the old fileContent line with
-    sa.Column('fileContent', LONGBLOB(), nullable=False),
-    # ...
-
-Run
----
-
-.. code-block:: bash
-
-    flask run
-
-User management
----------------
-
-.. code-block:: bash
-
-    flask user create your@email.address
-    flask user get your@email.address
-    flask user change_pass your@email.address
-
-Upload image
-------------
-
-For example we use cURL to upload the image.
+Example in *CURL*:
 
 .. code-block:: bash
 
@@ -97,9 +26,16 @@ For example we use cURL to upload the image.
         -F 'file=@/path/to/your/image.png;type=image/png' \
         -F username=1a339c02-404a-4b66-9fbb-cb30fb417c14 \
         -F 'password=knwAAOfLBcnkWzGxo0G/ZUzq9ukLb+gf5H/1nmPr7BE+im03qZarW4TvwVepYmi/cg9dEw+N4HDfLqQRfXBSdNawy7YkOQgwOYiRRq3t2PSjYd+Pme4SrMWUE1BYW5rt' \
-        -F 'description=Dog's Image'
+        -F 'description=Image #1'
 
-We got the result:
+Parameters:
+
+- **username**: This is required.
+- **password**: This is required.
+- **description**: image's description in string. This is optional.
+- **file**: Image type file. This is required.
+
+The above command would get result from server similar to this:
 
 .. code-block:: text
 
@@ -114,11 +50,15 @@ We got the result:
         }
     }
 
-You can go to http://image.local-domain:5000/serve/image/1/ca4ffe9f192f4f358e4981ceaafd8068.jpg
-to see your image.
+New created image can be viewed at
+*http://image.local-domain:5000/serve/image/1/ca4ffe9f192f4f358e4981ceaafd8068.jpg*.
 
-Update your image's description
--------------------------------
+POST
+^^^^
+
+Used to update an image's description.
+
+Example in *CURL*:
 
 .. code-block:: bash
 
@@ -130,9 +70,18 @@ Update your image's description
             "password": "knwAAOfLBcnkWzGxo0G/ZUzq9ukLb+gf5H/1nmPr7BE+im03qZarW4TvwVepYmi/cg9dEw+N4HDfLqQRfXBSdNawy7YkOQgwOYiRRq3t2PSjYd+Pme4SrMWUE1BYW5rt",
             "filename": "ca4ffe9f192f4f358e4981ceaafd8068.jpg",
             "description": "Cat's image"
-        }'
+          }'
 
-Then we got the similar result of create new image:
+Parameters:
+
+- **username**: This is required.
+- **password**: This is required.
+- **filename**: Image file's name. This is required.
+- **description**: Image's description in string.
+  This is optional. (If there is no description available
+  then the file's description will be delete.)
+
+Result:
 
 .. code-block:: text
 
@@ -147,8 +96,12 @@ Then we got the similar result of create new image:
         }
     }
 
-Delete an image
----------------
+DELETE
+^^^^^^
+
+Used to delete an image.
+
+Example in *CURL*:
 
 .. code-block:: bash
 
@@ -159,10 +112,36 @@ Delete an image
             "username": "1a339c02-404a-4b66-9fbb-cb30fb417c14",
             "password": "knwAAOfLBcnkWzGxo0G/ZUzq9ukLb+gf5H/1nmPr7BE+im03qZarW4TvwVepYmi/cg9dEw+N4HDfLqQRfXBSdNawy7YkOQgwOYiRRq3t2PSjYd+Pme4SrMWUE1BYW5rt",
             "filename": "ca4ffe9f192f4f358e4981ceaafd8068.jpg",
-        }'
+          }'
 
-Get your images
----------------
+Parameters:
+
+- **username**: This is required.
+- **password**: This is required.
+- **filename**: Image file's name. This is required.
+
+Images
+------
+
+APIs that can interact with multiple images.
+
+GET
+^^^
+
+*Not available.*
+
+PUT
+^^^
+
+*Not available.*
+
+POST
+^^^^
+
+Fetch an list of images uploaded by requesting user. Each page will return
+items limited by *IMAGEBUTLER_API_IMAGES_LIMIT* configuration.
+
+Example in *CURL*:
 
 .. code-block:: bash
 
@@ -172,5 +151,19 @@ Get your images
         -d {
             "username": "1a339c02-404a-4b66-9fbb-cb30fb417c14",
             "password": "knwAAOfLBcnkWzGxo0G/ZUzq9ukLb+gf5H/1nmPr7BE+im03qZarW4TvwVepYmi/cg9dEw+N4HDfLqQRfXBSdNawy7YkOQgwOYiRRq3t2PSjYd+Pme4SrMWUE1BYW5rt",
-            "page": 1
+            "page": 0
         }
+
+Parameter:
+
+- **username**: This is required.
+- **password**: This is required.
+- **page**: page number of the return list. This is optional (0).
+- **locale**: this will decide the format of some return attribute.
+  For example: created_date. This is optional (en).
+- **search**: keyword which will be used to look for in the description.
+
+DELETE
+^^^^^^
+
+*Not available.*

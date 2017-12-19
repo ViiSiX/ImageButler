@@ -15,3 +15,10 @@ echo "PEP8 violations:"
 echo "================"
 pycodestyle --first "$BASEDIR"/imagebutler
 echo "================"
+echo "End of PEP8./."
+echo "================\n"
+echo "Document link check:"
+echo "================"
+cd docs && make linkcheck
+echo "================"
+echo "End of Document link check./."
