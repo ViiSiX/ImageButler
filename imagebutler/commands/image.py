@@ -1,3 +1,5 @@
+"""This module define image supports commands for the application."""
+
 import click
 import progressbar
 from ..models import ImageModel
@@ -6,6 +8,7 @@ from ..imagebutler import db
 
 @click.group()
 def image():
+    """Dummy function to add `image` to click group."""
     pass
 
 
@@ -28,13 +31,13 @@ def thumbnail_regen(**kwargs):
                 ImageModel.file_thumbnail.is_(None)
             ).all()
 
-        bar = progressbar.ProgressBar(max_value=images_count)
+        progress_bar = progressbar.ProgressBar(max_value=images_count)
         for processing_image in images:
             processing_image.file_thumbnail = processing_image.gen_thumbnail()
             db.session.commit()
             images_progressed += 1
-            bar.update(images_progressed)
+            progress_bar.update(images_progressed)
 
     else:
-        click.echo('Usage: flask image gen_thumbnail all|missing',
+        click.echo('Usage: flask image gen_thumbnail --type all|missing',
                    err=True)

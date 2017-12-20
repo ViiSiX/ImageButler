@@ -3,32 +3,12 @@ Upload files using this API. For prototype the authentication way
 is username and password. Later we can use something like JWT or PEM file.
 """
 
+from werkzeug.datastructures import FileStorage
 from .apis import Resource, reqparse
 from ..imagebutler import rdb
 from ..models import db, ImageModel, UserModel
 from ..utils import user_identity_check
 from ..job_workers import worker_undo_cached_redis
-from werkzeug.datastructures import FileStorage
-
-
-put_parser = reqparse.RequestParser()
-put_parser.add_argument('username', required=True, type=str)
-put_parser.add_argument('password', required=True, type=str)
-put_parser.add_argument('description', required=False, type=str)
-put_parser.add_argument('file', required=True,
-                        type=FileStorage,
-                        location='files')
-
-post_parser = reqparse.RequestParser()
-post_parser.add_argument('filename', required=True, type=str)
-post_parser.add_argument('username', required=True, type=str)
-post_parser.add_argument('password', required=True, type=str)
-post_parser.add_argument('description', required=False, type=str)
-
-delete_parser = reqparse.RequestParser()
-post_parser.add_argument('filename', required=True, type=str)
-post_parser.add_argument('username', required=True, type=str)
-post_parser.add_argument('password', required=True, type=str)
 
 
 def image_return_skeleton(image_object):
@@ -54,74 +34,93 @@ def image_return_skeleton(image_object):
 class Image(Resource):
     """Image REST API."""
 
+    parsers = {
+        'PUT': reqparse.RequestParser(),
+        'POST': reqparse.RequestParser(),
+        'DELETE': reqparse.RequestParser()
+    }
+    parsers['PUT'].add_argument('username', required=True, type=str)
+    parsers['PUT'].add_argument('password', required=True, type=str)
+    parsers['PUT'].add_argument('description', required=False, type=str)
+    parsers['PUT'].add_argument('file', required=True,
+                                type=FileStorage,
+                                location='files')
+    parsers['POST'].add_argument('filename', required=True, type=str)
+    parsers['POST'].add_argument('username', required=True, type=str)
+    parsers['POST'].add_argument('password', required=True, type=str)
+    parsers['POST'].add_argument('description', required=False, type=str)
+    parsers['DELETE'].add_argument('filename', required=True, type=str)
+    parsers['DELETE'].add_argument('username', required=True, type=str)
+    parsers['DELETE'].add_argument('password', required=True, type=str)
+
     def put(self):
-        """PUT for upload a new image."""
-        args = put_parser.parse_args()
+        """PUT: for upload a new image."""
+        args = self.parsers['PUT'].parse_args()
         user = UserModel.query.filter_by(user_name=args.username).first()
 
         uic = user_identity_check(user, args.password)
         if not uic[0]:
             return uic[1]
 
-        im = ImageModel(args.file, user.user_id,
-                        file_description=args.description)
-        db.session.add(im)
+        image = ImageModel(args.file, user.user_id,
+                           file_description=args.description)
+        db.session.add(image)
         db.session.commit()
-        return image_return_skeleton(im)
+        return image_return_skeleton(image)
 
     def post(self):
-        """POST for update image's description."""
-        args = post_parser.parse_args()
+        """POST: for update image's description."""
+        args = self.parsers['POST'].parse_args()
         user = UserModel.query.filter_by(user_name=args.username).first()
 
         uic = user_identity_check(user, args.password)
         if not uic[0]:
             return uic[1]
 
-        im = ImageModel.query.filter_by(
+        image = ImageModel.query.filter_by(
             file_name=args.filename,
             user_id=user.user_id,
             is_deleted=False
         ).first()
 
-        if not im:
+        if not image:
             return {'return': {'error': 'Image not found!'}}
 
-        im.file_description = args.description
+        image.file_description = args.description
         db.session.commit()
 
-        return image_return_skeleton(im)
+        return image_return_skeleton(image)
 
     def delete(self):
-        """DELETE for mark image as deleted, clear Image's cache."""
-        args = post_parser.parse_args()
+        """DELETE: for mark image as deleted, clear Image's cache."""
+        args = self.parsers['DELETE'].parse_args()
         user = UserModel.query.filter_by(user_name=args.username).first()
 
         uic = user_identity_check(user, args.password)
         if not uic[0]:
             return uic[1]
 
-        im = ImageModel.query.filter_by(
+        image = ImageModel.query.filter_by(
             file_name=args.filename,
             user_id=user.user_id,
             is_deleted=False
         ).first()
 
-        if not im:
+        if not image:
             return {'return': {'error': 'Image not found!'}}
 
-        im.is_deleted = True
+        image.is_deleted = True
 
         # Clear the cache.
         queue = rdb.queue['serving']
         try:
-            cached_object = queue.fetch_job(im.file_name).result
+            cached_object = queue.fetch_job(image.file_name).result
             if cached_object:
-                print("Cleaning cache for %s" % im.file_name)
+                print("Cleaning cache for %s" % image.file_name)
                 queue.enqueue(
                     f=worker_undo_cached_redis,
-                    kwargs={'caching_object': im.serving_object},
-                    job_id=im.file_name,
+                    kwargs={'caching_object': image.serving_object},
+                    job_id=image.file_name,
                     result_ttl=1
                 )
         except AttributeError:

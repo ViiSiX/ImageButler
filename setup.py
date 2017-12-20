@@ -23,7 +23,7 @@ setup(
     url='https://viisix.space/projects/image-butler/',
     description='Simple images serving service,',
     long_description=description,
-    packages=['imagebutler', 'imagebutler.apis'],
+    packages=['imagebutler', 'imagebutler.apis', 'imagebutler.commands'],
     entry_points="""
         [flask.commands]
         user=imagebutler.commands:user
@@ -31,6 +31,7 @@ setup(
     """,
     include_package_data=True,
     install_requires=[
+        'babel',
         'Flask',
         'Flask-Cors',
         'Flask-Restful',
@@ -40,7 +41,8 @@ setup(
         'Flask-Login',
         'pycrypto',
         'Pillow',
-        'progressbar2'
+        'progressbar2',
+        'piexif'
     ],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',

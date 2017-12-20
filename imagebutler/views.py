@@ -2,7 +2,7 @@
 
 from flask import jsonify
 from flask_cors import cross_origin
-from .imagebutler import app, rdb
+from .imagebutler import app, rdb, config
 from .models import ImageModel
 from .job_workers import worker_do_cache_redis
 
@@ -19,7 +19,8 @@ def index_view():
                        'REST API and serving those images to the Internet '
                        'users.',
         'versions': {
-            'api': '0'
+            'release': config['VERSION'],
+            'api': config['API_VERSION']
         }
     })
 
@@ -29,29 +30,26 @@ def index_view():
 def image_view(user_id, file_name):
     """Return image following requests."""
 
-    queue = rdb.queue['serving']
+    queue = rdb.queue['serving'] if rdb else None
     try:
-        print("Serve from cache")
-        print(queue.fetch_job(file_name).result)
         cached_object = queue.fetch_job(file_name).result
         return cached_object.make_response()
     except AttributeError:
-        print("Serve from DB")
-        im = ImageModel.query.\
+        image = ImageModel.query.\
             filter_by(user_id=user_id,
                       file_name=file_name,
                       is_deleted=False).first()
-        if im is not None:
-            if rdb.worker_process is None:
-                rdb.start_worker()
-            queue.enqueue(
-                f=worker_do_cache_redis,
-                kwargs={'caching_object': im.serving_object},
-                job_id=file_name
-            )
-            return im.serving_object.make_response()
-        else:
-            return jsonify({'error': 'Not a single image found!'})
+        if image is not None:
+            if rdb:
+                if rdb.worker_process is None:
+                    rdb.start_worker()
+                queue.enqueue(
+                    f=worker_do_cache_redis,
+                    kwargs={'caching_object': image.serving_object},
+                    job_id=file_name
+                )
+            return image.serving_object.make_response()
+        return jsonify({'error': 'Not a single image found!'})
 
 
 @app.route('/serve/thumbnail/<int:user_id>/<string:file_name>')
@@ -59,23 +57,23 @@ def image_view(user_id, file_name):
 def thumbnail_view(user_id, file_name):
     """Return thumbnail of a image following requests."""
 
-    queue = rdb.queue['serving']
+    queue = rdb.queue['serving'] if rdb else None
     try:
         cached_object = queue.fetch_job(file_name).result
         return cached_object.make_response(is_thumbnail=True)
     except AttributeError:
-        im = ImageModel.query. \
+        image = ImageModel.query. \
             filter_by(user_id=user_id,
                       file_name=file_name,
                       is_deleted=False).first()
-        if im is not None:
-            if rdb.worker_process is None:
-                rdb.start_worker()
-            queue.enqueue(
-                f=worker_do_cache_redis,
-                kwargs={'caching_object': im.serving_object},
-                job_id=file_name
-            )
-            return im.serving_object.make_response(is_thumbnail=True)
-        else:
-            return jsonify({'error': 'Not a single image found!'})
+        if image is not None:
+            if rdb:
+                if rdb.worker_process is None:
+                    rdb.start_worker()
+                queue.enqueue(
+                    f=worker_do_cache_redis,
+                    kwargs={'caching_object': image.serving_object},
+                    job_id=file_name
+                )
+            return image.serving_object.make_response(is_thumbnail=True)
+        return jsonify({'error': 'Not a single image found!'})

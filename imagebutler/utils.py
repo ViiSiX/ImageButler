@@ -1,9 +1,13 @@
+"""This module provide support functions to other modules in the project."""
+
 import time
 import re
 import uuid
 import base64
 import pickle
 from io import BytesIO
+import piexif
+from PIL import Image
 from Crypto import Random
 from Crypto.Hash import SHA256
 
@@ -70,18 +74,80 @@ def get_image_exif(image):
     """
 
     try:
-        exif = image._getexif()  # There is not public method for this.
+        exif = image.info['exif']
 
-        if exif is not None:
-            exif_io = BytesIO()
-            pickle.dump(exif, exif_io, pickle.HIGHEST_PROTOCOL)
-            exif_data = exif_io.getvalue()
-            exif_io.close()
-            return exif_data
+        serialized_exif = \
+            pickle.dumps(piexif.load(exif), pickle.HIGHEST_PROTOCOL)
+        return serialized_exif
 
+    except KeyError:
         return None
-    except AttributeError:
-        return None
+
+
+def process_uploaded_image(image, max_size=0):
+    """
+    Process uploaded and return necessary information.
+
+    For resizing old image, we don't do it now but maybe in later releases.
+    :param image: Image object.
+    :type image: Image.Image
+    :param max_size: max size from the configuration
+    :type max_size: str
+    :return: a tuple of processed image information.
+    """
+
+    image_sio = BytesIO()
+    image_exif = get_image_exif(image)
+    if image_exif:
+        image_exif_deserialized = pickle.loads(image_exif)
+        image.save(image_sio, format=image.format,
+                   exif=piexif.dump(image_exif_deserialized))
+    else:
+        image_exif_deserialized = None
+        image.save(image_sio, format=image.format)
+    image_size = len(image_sio.getvalue())
+    image_dimension_size = image.size
+
+    # TODO: Move this to a utils function
+    max_size = str(max_size)
+    matched_config = re.match(r'^(\d+)M$', max_size)
+    if matched_config:
+        max_size = int(matched_config.group(1)) * 1024 * 1024
+    else:
+        matched_config = re.match(r'^(\d+)K$', max_size)
+        if matched_config:
+            max_size = int(matched_config.group(1)) * 1024
+        else:
+            max_size = 0
+
+    if 0 < max_size < image_size:
+        resize_ratio = (float(max_size) / image_size) ** 0.5
+        new_dimension_size = (
+            int(image_dimension_size[0] * resize_ratio),
+            int(image_dimension_size[1] * resize_ratio)
+        )
+        image.thumbnail(new_dimension_size, Image.ANTIALIAS)
+        image_dimension_size = image.size
+        image_sio.close()
+        image_sio = BytesIO()
+        if image_exif:
+            image_exif_deserialized["0th"][piexif.ImageIFD.XResolution] = (
+                image_dimension_size[0], 1
+            )
+            image_exif_deserialized["0th"][piexif.ImageIFD.YResolution] = (
+                image_dimension_size[1], 1
+            )
+            image.save(image_sio, format=image.format,
+                       exif=piexif.dump(image_exif_deserialized))
+        else:
+            image.save(image_sio, format=image.format)
+        image_size = len(image_sio.getvalue())
+
+    image_file_content = image_sio.getvalue()
+    image_checksum = get_checksum(image_file_content)
+    image_sio.close()
+
+    return image, image_file_content, image_checksum, image_size, image_exif
 
 
 def user_identity_check(user, password):
@@ -135,9 +201,8 @@ class Timer(object):
         elif total_time >= 1000:
             return "{seconds} seconds".format(seconds=total_time / 1000)
 
-        else:
-            return "{milliseconds} milliseconds".\
-                format(milliseconds=total_time)
+        return "{milliseconds} milliseconds".\
+            format(milliseconds=total_time)
 
     def spend(self, minutes):
         """
