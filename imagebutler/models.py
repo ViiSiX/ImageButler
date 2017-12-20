@@ -1,6 +1,7 @@
 """Docstring for image_butler.models module."""
 
 import datetime
+from copy import deepcopy
 from flask_login import UserMixin
 from . import utils
 from werkzeug.datastructures import FileStorage
@@ -103,6 +104,9 @@ class ImageModel(CustomModelMixin, db.Model):
                                nullable=True)
     file_checksum = db.Column('fileChecksum', db.String(64),
                               nullable=False)
+    file_size = db.Column('fileSize', db.Integer,
+                          nullable=False,
+                          default=0)
     is_deleted = db.Column('isDeleted', db.Boolean,
                            nullable=False, default=False)
     user_id = db.Column('userId', db.Integer,
@@ -136,13 +140,11 @@ class ImageModel(CustomModelMixin, db.Model):
 
         # Image processing
         image = Image.open(file.stream)
-        image_sio = utils.BytesIO()
-        image.save(image_sio, format=image.format)
         # Set image values into the model
-        self.file_exif = utils.get_image_exif(image)
-        self.file_content = image_sio.getvalue()
-        self.file_checksum = utils.get_checksum(self.file_content)
-        image_sio.close()
+        image, self.file_content, self.file_checksum, \
+            self.file_size, self.file_exif = \
+            utils.process_uploaded_image(image,
+                                         config['IMAGEBUTLER_MAX_IMAGE_SIZE'])
 
         # Set thumbnail into the model
         self.file_thumbnail = self.gen_thumbnail(image)
@@ -158,10 +160,9 @@ class ImageModel(CustomModelMixin, db.Model):
         :return: BytesIO object
         """
 
-        if not image_instance:
-            temp_image = Image.open(utils.BytesIO(self.file_content))
-        else:
-            temp_image = image_instance.copy()
+        # Image.copy() does not work since it do not copy the image format.
+        temp_image = deepcopy(image_instance) if image_instance \
+            else self.image
 
         image_sio = utils.BytesIO()
         temp_image.thumbnail(
@@ -173,15 +174,23 @@ class ImageModel(CustomModelMixin, db.Model):
         return image_sio.getvalue()
 
     @property
+    def image(self):
+        """Return the image instance from the database or from argument."""
+
+        return Image.open(utils.BytesIO(self.file_content))
+
+    @property
     def serving_object(self):
         """The model will not direct serving data to Flask but rather a
         medium class."""
+
         return ImageServingObject(self.file_mime,
                                   self.file_content,
                                   self.file_thumbnail)
 
     def __repr__(self):
         """Print the ImageModel instance."""
+
         return '<Image {file_name} - User Id {user_id}>'.format(
             file_name=self.file_name,
             user_id=self.user_id

@@ -5,6 +5,9 @@ Simple image server built on Flask.
 
 Developed Python version: Python 3.6.
 
+.. image:: https://travis-ci.org/ViiSiX/ImageButler.svg?branch=R%2F0.0
+    :target: https://travis-ci.org/ViiSiX/ImageButler
+
 Installation
 ------------
 
@@ -25,6 +28,10 @@ Create *image_butler.conf* referring following example:
     SERVER_NAME = 'image.local-domain:5000'
     REDISLITE_PATH = '<path-to-your>/ImageButler.rdb'
     REDISLITE_WORKER_PID = '<path-to-your>/workers.pid'
+
+    IMAGEBUTLER_MAX_THUMBNAIL = 150, 150
+    IMAGEBUTLER_API_IMAGES_LIMIT = 5
+    IMAGEBUTLER_MAX_IMAGE_SIZE = '1M'
 
 Export environment variables:
 
