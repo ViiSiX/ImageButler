@@ -1,6 +1,10 @@
 ImageButler
 ===========
 
+.. image:: https://api.codacy.com/project/badge/Grade/927fa27f92904cd6af53cae22532794d
+   :alt: Codacy Badge
+   :target: https://www.codacy.com/app/ViiSiX/ImageButler?utm_source=github.com&utm_medium=referral&utm_content=ViiSiX/ImageButler&utm_campaign=badger
+
 Simple image server built on Flask.
 
 Developed Python version: Python 3.6.
