@@ -7,6 +7,8 @@ Developed Python version: Python 3.6.
 
 .. image:: https://travis-ci.org/ViiSiX/ImageButler.svg?branch=R%2F0.1
     :target: https://travis-ci.org/ViiSiX/ImageButler
+.. image:: https://api.codacy.com/project/badge/Grade/d5c733a686d74f61af3ab09d7c85d288
+    :target: https://www.codacy.com/app/ViiSiX/ImageButler?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ViiSiX/ImageButler&amp;utm_campaign=Badge_Grade
 
 Installation
 ------------
