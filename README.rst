@@ -10,6 +10,8 @@ Developed Python version: Python 3.6.
 .. image:: https://api.codacy.com/project/badge/Grade/d5c733a686d74f61af3ab09d7c85d288
     :target: https://www.codacy.com/app/ViiSiX/ImageButler?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ViiSiX/ImageButler&amp;utm_campaign=Badge_Grade
 
+**Documents:** `0.1 <https://imagebutler.viisix.space/0.1>`_
+
 Installation
 ------------
 

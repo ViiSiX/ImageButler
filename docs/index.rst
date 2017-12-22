@@ -13,6 +13,10 @@ Welcome to ImageButler
 Image Butler is a simple image hosting server. It's written on
 Python and has APIs for manage hosted images.
 
+**Document Version: 0.1**
+
+*Other versions please visit* `here <others.html>`_.
+
 Build's statuses
 ================
 
@@ -31,4 +35,5 @@ User's guide
    installation
    commandline
    apis
+   others
 
