@@ -6,7 +6,7 @@ from . import models
 from . import apis, commands, views
 
 
-__version__ = '0.1.0rc0'
+__version__ = '0.1.0rc1'
 
 config['VERSION'] = __version__
 config['API_VERSION'] = api_version

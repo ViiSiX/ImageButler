@@ -16,7 +16,7 @@ echo "================"
 pycodestyle --first "$BASEDIR"/imagebutler
 echo "================"
 echo "End of PEP8./."
-echo "================\n"
+echo "================"
 echo "Document link check:"
 echo "================"
 cd docs && make linkcheck
