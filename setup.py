@@ -11,7 +11,7 @@ with open('imagebutler/__init__.py', 'rb') as f:
     ).group(1)).replace('\'', '')
 with io.open('README.rst', encoding='utf-8') as f:
     description = f.read()
-with io.open('HISTORY.rst', encoding='utf-8') as f:
+with io.open('docs/history.rst', encoding='utf-8') as f:
     description += "\n\n%s" % f.read()
 
 

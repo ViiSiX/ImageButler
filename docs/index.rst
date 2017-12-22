@@ -35,5 +35,6 @@ User's guide
    installation
    commandline
    apis
+   history
    others
 
