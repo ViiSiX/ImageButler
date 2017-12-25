@@ -1,5 +1,6 @@
 """Just a prototype for REST-ful."""
-from .apis import Resource
+
+from flask_restful import Resource
 
 
 class Ping(Resource):

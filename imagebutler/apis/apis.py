@@ -1,7 +1,7 @@
 """Import libraries and some predefined variables."""
 
 from flask import Blueprint
-from flask_restful import Api, Resource, reqparse
+from flask_restful import Api
 from ..imagebutler import config
 
 

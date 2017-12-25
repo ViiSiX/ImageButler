@@ -10,15 +10,21 @@ py.test "$BASEDIR"/tests \
     --cov "$BASEDIR"/imagebutler \
     --cov-report term-missing
 
+if [ $? -gt 0 ]; then exit 1; fi
+
 echo "================"
 echo "PEP8 violations:"
 echo "================"
 pycodestyle --first "$BASEDIR"/imagebutler
 echo "================"
-echo "End of PEP8./."
+echo "End of PEP8./."; echo ""
+echo "================"
+echo "Bandit check:"
+echo "================"
+bandit -r "$BASEDIR"/imagebutler
 echo "================"
 echo "Document link check:"
 echo "================"
 cd docs && make linkcheck
 echo "================"
-echo "End of Document link check./."
+echo "End of Document link check./."; echo ""

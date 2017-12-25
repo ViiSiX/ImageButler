@@ -5,6 +5,7 @@ apipkg==1.4
 argh==0.26.2
 astroid==1.5.3
 Babel==2.5.1
+bandit==1.4.0
 certifi==2017.11.5
 chardet==3.0.4
 click==6.7
@@ -18,6 +19,8 @@ Flask-Migrate==2.1.1
 Flask-Redislite==0.1.1
 Flask-RESTful==0.3.6
 Flask-SQLAlchemy==2.3.2
+gitdb2==2.0.3
+GitPython==2.1.8
 idna==2.6
 imagesize==0.7.1
 isort==4.2.15
@@ -28,8 +31,10 @@ livereload==2.5.1
 Mako==1.0.7
 MarkupSafe==1.0
 mccabe==0.6.1
+msgpack-python==0.4.8
 olefile==0.44
 pathtools==0.1.2
+pbr==3.1.1
 pep8==1.7.1
 piexif==1.0.13
 Pillow==4.3.0
@@ -57,11 +62,13 @@ redislite==3.2.311
 requests==2.18.4
 rq==0.9.1
 six==1.11.0
+smmap2==2.0.3
 snowballstemmer==1.2.1
 Sphinx==1.6.5
 sphinx-autobuild==0.7.1
 sphinxcontrib-websupport==1.0.1
 SQLAlchemy==1.1.14
+stevedore==1.28.0
 tornado==4.5.2
 tox==2.9.1
 urllib3==1.22

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+import sys
 import pytest
 import uuid
 import time
-import pickle
+import msgpack
 import piexif
 from Crypto import Random
 from PIL import Image
@@ -61,7 +62,6 @@ def test_validate_mime():
     for mime in valid_mimes:
         utils.validate_mime(mime)
     for mime in invalid_mimes:
-        print(mime)
         with pytest.raises(TypeError) as except_info:
             utils.validate_mime(mime)
         except_message = str(except_info.value)
@@ -151,9 +151,36 @@ def test_get_image_exif(sample_pil_jpeg_object_with_exif,
     exif = utils.get_image_exif(sample_pil_jpeg_object_with_exif)
     assert exif
     # Ensure that the function return right format
-    deserialize_exif = pickle.loads(exif)
+    deserialize_exif = msgpack.unpackb(exif, use_list=False)
     assert deserialize_exif
     assert piexif.dump(deserialize_exif)
+
+
+@pytest.mark.skipif(sys.version[0] == '3',
+                    reason="Only for python 2.x")
+def test_advance_get_image_exif_py2(sample_pil_jpeg_object_with_exif):
+    """Test if exif is processed consistency. Only for Python 2.x."""
+
+    having_exif_image = sample_pil_jpeg_object_with_exif
+    ori_exif = piexif.load(having_exif_image.info['exif'])
+    deserialized_exif = msgpack.unpackb(
+        utils.get_image_exif(having_exif_image), use_list=False
+    )
+    assert deserialized_exif == ori_exif
+
+
+@pytest.mark.skipif(sys.version[0] == '2',
+                    reason="Only for python 3.x")
+def test_advance_get_image_exif_py3(sample_pil_jpeg_object_with_exif):
+    """Test if exif is processed consistency. Only for Python 3.x."""
+
+    having_exif_image = sample_pil_jpeg_object_with_exif
+    ori_exif = piexif.load(having_exif_image.info['exif'])
+    deserialized_exif = msgpack.unpackb(
+        utils.get_image_exif(having_exif_image), use_list=False
+    )
+    for k in ori_exif.keys():
+        assert ori_exif[k] == deserialized_exif[k.encode()]
 
 
 def test_process_uploaded_image_with_exif(

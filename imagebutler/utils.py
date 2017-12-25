@@ -4,8 +4,8 @@ import time
 import re
 import uuid
 import base64
-import pickle
 from io import BytesIO
+import msgpack
 import piexif
 from PIL import Image
 from Crypto import Random
@@ -62,6 +62,15 @@ def get_checksum(data):
     except TypeError:
         data = data.encode('utf-8')
         return get_checksum(data)
+#
+#
+# def exif_to_dict(exif_data):
+#     """
+#     Given the exif data, extract and turn it into dict for storing.
+#
+#     :param exif_data: Exif data from return from PIL.Image.Image.
+#     :return:
+#     """
 
 
 def get_image_exif(image):
@@ -74,10 +83,9 @@ def get_image_exif(image):
     """
 
     try:
-        exif = image.info['exif']
-
+        exif = piexif.load(image.info['exif'])
         serialized_exif = \
-            pickle.dumps(piexif.load(exif), pickle.HIGHEST_PROTOCOL)
+            msgpack.packb(exif)
         return serialized_exif
 
     except KeyError:
@@ -99,7 +107,8 @@ def process_uploaded_image(image, max_size=0):
     image_sio = BytesIO()
     image_exif = get_image_exif(image)
     if image_exif:
-        image_exif_deserialized = pickle.loads(image_exif)
+        image_exif_deserialized = msgpack.unpackb(image_exif, use_list=False)
+        print(image_exif_deserialized)
         image.save(image_sio, format=image.format,
                    exif=piexif.dump(image_exif_deserialized))
     else:
@@ -131,10 +140,10 @@ def process_uploaded_image(image, max_size=0):
         image_sio.close()
         image_sio = BytesIO()
         if image_exif:
-            image_exif_deserialized["0th"][piexif.ImageIFD.XResolution] = (
+            image_exif_deserialized[b"0th"][piexif.ImageIFD.XResolution] = (
                 image_dimension_size[0], 1
             )
-            image_exif_deserialized["0th"][piexif.ImageIFD.YResolution] = (
+            image_exif_deserialized[b"0th"][piexif.ImageIFD.YResolution] = (
                 image_dimension_size[1], 1
             )
             image.save(image_sio, format=image.format,

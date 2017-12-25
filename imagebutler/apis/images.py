@@ -1,7 +1,8 @@
 """APIs used for more than one image at the same time."""
 
 from babel.dates import format_datetime
-from .apis import Resource, reqparse, config
+from flask_restful import Resource, reqparse
+from .apis import config
 from ..models import ImageModel, UserModel
 from ..utils import user_identity_check
 
