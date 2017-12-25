@@ -4,7 +4,7 @@ is username and password. Later we can use something like JWT or PEM file.
 """
 
 from werkzeug.datastructures import FileStorage
-from .apis import Resource, reqparse
+from flask_restful import Resource, reqparse
 from ..imagebutler import rdb
 from ..models import db, ImageModel, UserModel
 from ..utils import user_identity_check

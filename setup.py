@@ -42,7 +42,8 @@ setup(
         'pycrypto',
         'Pillow',
         'progressbar2',
-        'piexif'
+        'piexif',
+        'msgpack-python'
     ],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
