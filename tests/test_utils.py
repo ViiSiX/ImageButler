@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
+
+import os
 import sys
 import pytest
 import uuid
 import time
 import msgpack
 import piexif
-from Crypto import Random
 from PIL import Image
 from imagebutler import utils
 
@@ -126,18 +127,23 @@ def test_get_checksum():
     """Test get_checksum function."""
 
     assert utils.get_checksum('aaa') == \
-        '9834876dcfb05cb167a5c24953eba58c4ac89b1adf57f28f2f9d09af107ee8f0'
+        b'9834876dcfb05cb167a5c24953eba58c4ac89b1adf57f28f2f9d09af107ee8f0'
     assert utils.get_checksum('tôi') == \
-        'e530a4ec95132d4fdc303a4c7d42cca60d1bf78a49c1db9a7d840dff0caf0ae2'
-    assert utils.get_checksum(Random.new().read(10))
+        b'e530a4ec95132d4fdc303a4c7d42cca60d1bf78a49c1db9a7d840dff0caf0ae2'
+    assert utils.get_checksum(os.urandom(10))
 
 
 def test_generate_password():
     """Test generate_password function."""
 
     assert utils.generate_password()
-    assert isinstance(utils.generate_password(), str) or \
-        isinstance(utils.generate_password(), basestring)
+    try:
+        correct_instance = isinstance(utils.generate_password(),
+                                      (basestring, str))
+    except NameError:
+        correct_instance = isinstance(utils.generate_password(),
+                                      (bytes, str))
+    assert correct_instance
 
 
 def test_get_image_exif(sample_pil_jpeg_object_with_exif,

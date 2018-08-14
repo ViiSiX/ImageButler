@@ -1,15 +1,16 @@
 """This module provide support functions to other modules in the project."""
 
+import os
 import time
 import re
 import uuid
-import base64
 from io import BytesIO
 import msgpack
 import piexif
+from binascii import hexlify
 from PIL import Image
-from Crypto import Random
-from Crypto.Hash import SHA256
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
 
 
 def validate_email(email):
@@ -47,8 +48,7 @@ def generate_uuid():
 def generate_password():
     """Return a password string."""
 
-    rng = Random.new().read
-    return base64.b64encode(rng(96)).decode('ascii')
+    return hexlify(os.urandom(128))
 
 
 def get_checksum(data):
@@ -58,7 +58,9 @@ def get_checksum(data):
     :return: Checksum string.
     """
     try:
-        return SHA256.new(data).hexdigest()
+        digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+        digest.update(data)
+        return hexlify(digest.finalize())
     except TypeError:
         data = data.encode('utf-8')
         return get_checksum(data)

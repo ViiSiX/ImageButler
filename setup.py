@@ -39,11 +39,11 @@ setup(
         'Flask-Migrate',
         'Flask-Redislite',
         'Flask-Login',
-        'pycrypto',
+        'cryptography',
         'Pillow',
         'progressbar2',
         'piexif',
-        'msgpack-python'
+        'msgpack'
     ],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
