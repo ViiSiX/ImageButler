@@ -11,7 +11,10 @@ def test_pylint(source_code_dir):
     """
 
     PARAMS.append(source_code_dir)
-    results = lint.Run(PARAMS, exit=False).linter.stats
+    try:
+        results = lint.Run(PARAMS, do_exit=False).linter.stats
+    except TypeError:
+        results = lint.Run(PARAMS, exit=False).linter.stats
     assert results['global_note'] >= 9.0
     assert results['error'] == 0
     assert results['fatal'] == 0
